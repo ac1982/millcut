@@ -1,0 +1,38 @@
+# Experiment outputs, certificates, datasets cache, and zip archives (kept locally, not tracked in Git)
+/results/
+*.zip
+*.tar.gz
+*.tgz
+
+# Local workflow & private deployment configs
+/AGENTS.md
+/cloudflare.config.ts
+.wrangler/
+
+# C++ / CMake / Wasm build artifacts (except prebuilt demo bundle in web/wasm/)
+build/
+build_*/
+cmake-build-*/
+*.o
+*.obj
+*.a
+*.so
+*.dylib
+*.dll
+*.exe
+mill_cxx23_cli
+
+# Python cache & virtual environments
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+*.egg-info/
+
+# OS & editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp

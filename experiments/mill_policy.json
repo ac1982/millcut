@@ -1,0 +1,57 @@
+{
+  "name": "v2_tri_cs6_f0.9_0.985_flt4_g1_8_def",
+  "kind": "rule_list",
+  "rules": [
+    {
+      "branch": "colstrip",
+      "conditions": [
+        {
+          "feature": "area_lower_bound",
+          "op": "le",
+          "threshold": 6
+        },
+        {
+          "feature": "items",
+          "op": "ge",
+          "threshold": 25
+        },
+        {
+          "feature": "items",
+          "op": "le",
+          "threshold": 160
+        },
+        {
+          "feature": "lower_bound_fill",
+          "op": "ge",
+          "threshold": 0.9
+        },
+        {
+          "feature": "lower_bound_fill",
+          "op": "le",
+          "threshold": 0.985
+        },
+        {
+          "feature": "repeat_fraction",
+          "op": "le",
+          "threshold": 0.2
+        },
+        {
+          "feature": "height_cv",
+          "op": "ge",
+          "threshold": 0.22
+        }
+      ]
+    },
+    {
+      "branch": "guide1",
+      "conditions": [
+        {
+          "feature": "area_lower_bound",
+          "op": "le",
+          "threshold": 8
+        }
+      ]
+    }
+  ],
+  "default_branch": "default"
+}

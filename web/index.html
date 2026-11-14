@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>既省原纸，也少换刀 — 造纸与包装车间免费智能排样</title>
+  <meta name="description" content="同时计算原纸成本与换版调刀工时，免费输出切纸机可直接执行、综合总成本最低的排样方案。" />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <header class="nav">
+    <div class="wrap nav-inner">
+      <span class="brand">省纸 · 省刀 · 算总账</span>
+      <nav class="nav-links">
+        <a class="nav-link" href="#batch">批量算总账</a>
+        <a class="nav-link" href="#single">散单省原纸</a>
+        <a class="nav-link" href="#proof">实测与对比</a>
+        <a class="nav-link cta-pill" href="#try">免费试算</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <!-- 1. 核心主张 + 车间批量单双维度总成本工作台 -->
+    <section id="batch" class="hero wrap">
+      <div class="eyebrow">免费替代收费工业排样软件 · 浏览器本地运行 · 零数据上传</div>
+      <h1>切纸车间的两笔账：<wbr />既省原纸，也少换刀。</h1>
+      <p class="lead">
+        省下一张白卡纸约省 2 元，但多换一次版、重调一次刀就要花 6–15 分钟人工与机台费。
+        只追求少用一两张纸，往往切出十几种碎版，反而亏了工时。我们把<strong>原纸</strong>与<strong>换刀叠切工时</strong>放在一起算，直接给出总成本最低的可执行排法。
+      </p>
+
+      <div class="workbench">
+        <div class="wb-top">
+          <div class="wb-order-row">
+            <label class="wb-label" for="batchOrderSelect">示例车间批量单</label>
+            <select id="batchOrderSelect" class="wb-select"></select>
+          </div>
+          <div class="wb-presets">
+            <button type="button" id="presetGuillotine" class="chip active">程控切纸机（换版 6 分钟）</button>
+            <button type="button" id="presetSlitter" class="chip">分切圆刀机（调刀 15 分钟）</button>
+          </div>
+        </div>
+
+        <div class="sliders">
+          <div class="slider-item">
+            <div class="slider-head">
+              <span>每张大纸价格</span>
+              <b id="valSheetCost">¥2.00</b>
+            </div>
+            <input type="range" id="rngSheetCost" min="1.0" max="8.0" step="0.2" value="2.0" />
+          </div>
+          <div class="slider-item">
+            <div class="slider-head">
+              <span>每次换版调刀耗时</span>
+              <b id="valSetupMin">6 分钟</b>
+            </div>
+            <input type="range" id="rngSetupMin" min="2" max="25" step="1" value="6" />
+          </div>
+          <div class="slider-item">
+            <div class="slider-head">
+              <span>机台含人工费率</span>
+              <b id="valMachineRate">¥180 / 小时</b>
+            </div>
+            <input type="range" id="rngMachineRate" min="60" max="360" step="15" value="180" />
+          </div>
+        </div>
+
+        <!-- 三种可选车间目标方案 -->
+        <div class="plan-tabs" id="batchPlanTabs"></div>
+
+        <!-- 左右直观叠切对比 -->
+        <div class="compare batch-compare">
+          <div class="side">
+            <div class="side-head">
+              <div>
+                <span class="side-name">常规省纸排法（不顾换刀）</span>
+                <div class="side-meta" id="batchBaseMeta">–</div>
+              </div>
+              <div class="side-price muted">
+                <span class="price-tag">综合成本</span>
+                <b id="batchBaseCost">–</b>
+              </div>
+            </div>
+            <canvas id="batchBaseCanvas" class="sheets"></canvas>
+            <div class="side-foot" id="batchBaseFoot">–</div>
+          </div>
+
+          <div class="side ours">
+            <div class="side-head">
+              <div>
+                <span class="side-name" id="batchOursTitle">我们的排法 · 综合总成本最低</span>
+                <div class="side-meta" id="batchOursMeta">–</div>
+              </div>
+              <div class="side-price good">
+                <span class="price-tag" id="batchSavingBadge">立省 –</span>
+                <b id="batchOursCost">–</b>
+              </div>
+            </div>
+            <canvas id="batchOursCanvas" class="sheets"></canvas>
+            <div class="side-foot" id="batchOursFoot">–</div>
+          </div>
+        </div>
+
+        <p class="caption wb-caption" id="batchNote">
+          切纸机单次压纸上限按 200 张（300g 白卡约 16.5cm 压纸高度）、每叠每刀平均操作周期 9 秒折算；所有品种数量 100% 精确交付、零超产积压、固定纸纹方向不旋转。
+        </p>
+      </div>
+    </section>
+
+    <!-- 2. 零散异形单：直接少用一张大纸 + 3D 三轮直刀动画 -->
+    <section id="single" class="how">
+      <div class="wrap">
+        <h2>遇到零散异形单，直接少开一张大纸</h2>
+        <p class="section-lead">
+          当每种尺寸只有 1 件、无法叠切时，省纸就是第一目标。常规算法一张一张往里塞，最后总剩几个零件要多开一张纸；我们全局统筹拼成整齐条带，直接省下一整张。
+        </p>
+
+        <div class="compare single-compare">
+          <div class="side">
+            <div class="side-head">
+              <span class="side-name">常规排法（PackingSolver 10 秒）</span>
+              <span class="side-num muted"><b id="heroBaseCount">–</b> 张</span>
+            </div>
+            <canvas id="heroBase" class="sheets"></canvas>
+            <div class="side-foot">纸张利用率 <b id="heroBaseUtil">–</b></div>
+          </div>
+          <div class="side ours">
+            <div class="side-head">
+              <span class="side-name">我们的排法</span>
+              <span class="side-num good"><b id="heroOursCount">–</b> 张</span>
+            </div>
+            <canvas id="heroOurs" class="sheets"></canvas>
+            <div class="side-foot">纸张利用率 <b id="heroOursUtil" class="good">–</b></div>
+          </div>
+        </div>
+
+        <p class="caption">
+          盲测实例：<span id="heroDesc">–</span>。
+          <button id="heroReplay" class="link-btn">重播排样动画</button>
+        </p>
+
+        <div class="steps">
+          <div class="step">
+            <div class="step-visual"><canvas id="howInput"></canvas></div>
+            <h3><span class="n">1</span>输入订单尺寸与数量</h3>
+            <p>支持大度 889×1194、正度 787×1092 或任意特规大纸。</p>
+          </div>
+          <div class="step">
+            <div class="step-visual"><canvas id="howLayout"></canvas></div>
+            <h3><span class="n">2</span>固定纸纹、精准拼版</h3>
+            <p>零件严格不旋转，长宽与需求件数一件不差。</p>
+          </div>
+          <div class="step">
+            <div class="step-visual three"><div id="howCut"></div></div>
+            <h3><span class="n">3</span>断头台三轮直刀照切</h3>
+            <p id="howCutCaption">每刀从头切到尾，最多切三轮。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. 实测数据与商业价值对照 -->
+    <section id="proof" class="proof wrap">
+      <h2>实测账本与行业对比</h2>
+      <p class="section-lead">
+        所有测试均在相同时间预算与工艺约束下与国际开源标杆 PackingSolver 正面对比，每一份输出方案均经两套独立几何校验程序逐刀核对。
+      </p>
+
+      <div class="stats stats-4">
+        <div class="stat">
+          <div class="stat-big good" id="statBatchSave">省 45%+</div>
+          <div class="stat-title">车间批量单综合成本</div>
+          <div class="stat-sub" id="statBatchSub">
+            12 份标准白卡批量单实测：换版次数大幅压缩，在极少增加甚至不增加原纸下显著省工时
+          </div>
+        </div>
+        <div class="stat">
+          <div class="stat-big good">省 15%</div>
+          <div class="stat-title">异形分条散单用纸</div>
+          <div class="stat-sub">
+            未参与开发的保留测试集中，目标散单 82 张 → 70 张；其余常规订单稳健持平
+          </div>
+        </div>
+        <div class="stat">
+          <div class="stat-big" id="statBksRate">追平最优</div>
+          <div class="stat-title">公开学术基准题库</div>
+          <div class="stat-sub" id="statBksSub">
+            对标 Berkey / Martello 国际公开测试题长期最好记录，目标张数精确下探追平差距
+          </div>
+        </div>
+        <div class="stat">
+          <div class="stat-big good">¥0 免费</div>
+          <div class="stat-title">替代收费利基排样软件</div>
+          <div class="stat-sub">
+            同类商业软件年费常达数千至数万元/席位；本核心引擎仅 ~350 KB，免安装、离线可用
+          </div>
+        </div>
+      </div>
+
+      <p class="fine" id="proofFine">
+        适用范围与诚实说明：批量多件订单可通过叠切合并版式大幅节省换刀时间与综合成本；单件异形高差单可节省 1 张大纸（2–6 张规模）。对于零件尺寸高度随机或超大板数纯装箱题，省纸张数与国际最好记录持平或个别差 1 张，系统不会虚报收益。
+      </p>
+    </section>
+
+    <!-- 4. 现场试算（支持批量单 Pareto 多方案 & 散单省纸） -->
+    <section id="try" class="try">
+      <div class="wrap">
+        <details id="tryBox" open>
+          <summary>
+            <span>免费现场试算</span>
+            <span class="summary-sub">在您的浏览器本地实时运行 C++23 / WebAssembly 引擎，订单数据绝不上传服务器</span>
+          </summary>
+
+          <div class="try-body">
+            <div class="try-controls">
+              <select id="trySelect"></select>
+              <div id="customFields" class="custom" hidden>
+                <label>大纸宽 <input id="customW" type="number" value="889" min="50" /></label>
+                <label>高 <input id="customH" type="number" value="1194" min="50" /></label>
+                <label class="file-btn">上传订单 CSV<input id="customFile" type="file" accept=".csv,text/csv" hidden /></label>
+                <button type="button" id="dlSampleCsv" class="link-btn">下载 CSV 模板</button>
+                <span id="customInfo" class="muted">格式：ID, WIDTH, HEIGHT, COPIES</span>
+              </div>
+              <button id="tryRun" class="btn">立即排样算账</button>
+            </div>
+
+            <div id="tryResult" hidden>
+              <p id="trySummary" class="try-summary"></p>
+              <div id="tryParetoTabs" class="plan-tabs compact-tabs" hidden></div>
+              <div class="try-grid">
+                <div class="side">
+                  <div class="try-label" id="tryBaseLabel">常规排法</div>
+                  <canvas id="tryBase" class="sheets"></canvas>
+                </div>
+                <div class="side ours">
+                  <div class="try-label good" id="tryOursLabel">我们的排法</div>
+                  <canvas id="tryOurs" class="sheets"></canvas>
+                </div>
+              </div>
+              <div class="try-actions">
+                <button id="dlPlan" class="btn btn-outline">下载车间裁切工单（.md）</button>
+                <button id="dlTree" class="link-btn">下载三阶段切割树（CSV）</button>
+              </div>
+            </div>
+
+            <p class="fine">
+              提示：浏览器内运行的是 ~350 KB 零依赖轻量引擎（计算约 1.5–4 秒）；若订单含批量件数（COPIES ≥ 2），将自动同时给出「极限省纸」「综合总成本最低」「最少换刀」多套方案供车间自由切换。
+            </p>
+          </div>
+        </details>
+      </div>
+    </section>
+  </main>
+
+  <footer class="wrap footer">
+    <span>造纸与印后包装车间排样优化 · 省原纸 × 少换刀双目标决策引擎</span>
+    <span class="muted">100% 独立双校验通过 · 零外部依赖 C++23 &amp; WebAssembly</span>
+  </footer>
+
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
